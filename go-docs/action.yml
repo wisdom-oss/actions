@@ -1,0 +1,33 @@
+name: 'Build and Push Documentation'
+description: 'Build documentation for go-based repositories and upload the generated documentation as artifact' 
+
+runs:
+  using: "composite"
+  steps:
+    - id: checkout-repository
+      name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - id: init-go
+      name: Initialize latest stable Go Version
+      uses: actions/setup-go@v5
+      with:
+        go-version: 'stable'
+        cache: false
+    
+    - id: install-gomarkdoc
+      name: Install github.com/princjef/gomarkdoc
+      run: go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
+
+    - id: generate-documentation
+      name: Generate Code Documentation
+      run: gomarkdoc --output documentation.md ./...
+
+    - id: upload-artifact
+      name: Upload Documentation Files as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: |
+          documentation.md
+          README.md
