@@ -32,8 +32,8 @@ runs:
         show: all
       if: always()
 
-    - id: generate-pr-comment
-      name: Generate Comment for Pull Request
+    - id: generate-comment
+      name: Generate Comment
       run: |
         comment=$(cat summary.md)
         echo "COMMENT<<EOF" >> $GITHUB_OUTPUT
@@ -43,8 +43,9 @@ runs:
     - id: comment-pr
       name: Write PR Comment
       uses: actions/github-script@v7
+      if: ${{ github.event_name == 'pull_request' }}
       env:
-        PR_COMMENT: ${{ steps.generate-pr-comment.outputs.comment }}
+        PR_COMMENT: ${{ steps.generate-comment.outputs.comment }}
       with:
         script: |
           const {PR_COMMENT} = process.env
@@ -54,4 +55,18 @@ runs:
             repo: context.repo.repo,
             body: PR_COMMENT
           })
-    
+    - id: comment-commit
+      name: Write Commit Comment
+      uses: actions/github-script@v7
+      if: ${{ github.event_name != 'pull_request' }}
+      env:
+        COMMIT_COMMENT: ${{ steps.generate-comment.outputs.comment }}
+      with:
+        script: |
+          const {COMMIT_COMMENT} = process.env
+          github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha
+            body: COMMIT_COMMENT
+          })
