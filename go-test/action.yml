@@ -70,6 +70,6 @@ runs:
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            commit_sha: context.sha
+            commit_sha: context.sha,
             body: COMMIT_COMMENT
           })
