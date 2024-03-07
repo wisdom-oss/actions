@@ -1,7 +1,7 @@
 <div align="center">
 <img height="150px" src="https://raw.githubusercontent.com/wisdom-oss/brand/main/svg/standalone_color.svg">
 <h1>Go Test Report</h1>
-<h3>action/go-tests</h3>
+<h3>actions/go-tests</h3>
 <p>🧪 an action for posting test results on a </p>
 </div>
 
@@ -11,10 +11,10 @@ push every incoming commit  into another repository on a GitLab Server.
 ## Usage
 To use this action in your repository you need to use the following snippet:
 ```yaml
-name: Mirror Repository
+name: Check Unit Test
 on: [push]
 jobs:
-  mirror:
+  test:
     permissions:
       checks: write
       pull-requests: write
