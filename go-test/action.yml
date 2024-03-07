@@ -41,7 +41,7 @@ runs:
         comment=$(cat summary.md)
         echo "COMMENT<<EOF" >> $GITHUB_OUTPUT
         echo $comment >> $GITHUB_OUTPUT 
-        echo "EOF" >> $GIHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
     
     - id: comment-pr
       name: Write PR Comment
