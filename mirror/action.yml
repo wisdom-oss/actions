@@ -1,0 +1,66 @@
+name: 'Mirror Incoming Push'
+description: 'Mirror an incoming push event to a GitLab instance'
+
+inputs:
+  host:
+    description: 'the host your gitlab instance is running on'
+    required: true
+    default: 'gitlab.uni-oldenburg.de'
+  user:
+    description: 'the user which is used to access the instance'
+    required: true
+  pat:
+    description: 'the private access token used to access the repository'
+    required: true
+  namespace:
+    description: 'the namespace in which the repository shall be created if needed'
+    required: true
+    default: '14014'
+  repository:
+    description: 'the name of the repository'
+    required: true
+
+outputs:
+  created-repository:
+    description: 'Indicates if the repository has been created'
+    value: ${{ steps.create-repo.outputs.created-repo }}
+  repo-url:
+    description: 'contains the full http url pointing to the repository'
+    value: ${{ steps.create-repo.outputs.repo-url }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: create-repo
+      shell: bash
+      run: |
+        REPO_CREATION_STATUS=$(curl -X POST -w "%{http_code}" -o "repo-data.json" --oauth2-bearer "${{ inputs.pat }}" "${{ inputs.host }}/api/v4/projects?name=${{ inputs.repository }}&namespace_id=${{inputs.namespace}}")
+
+        if [ "$REPO_CREATION_STATUS" -eq 201  ]; then
+            echo "::notice ::Repository created"
+            echo "created-repo=true" >> $GITHUB_OUTPUT
+            echo "repo-url=$(cat repo-data.json | jq --raw-output .http_url_to_repo)" >> $GITHUB_OUTPUT
+
+            echo "### :sparkles: Created Repository" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "```json" >> $GITHUB_STEP_SUMMARY
+            echo "$(cat repo-data.json | jq)" >> $GITHUB_STEP_SUMMARY
+            echo "```"
+        elif [ "$REPO_CREATION_STATUS" -eq 400  ]; then
+            echo "::notice ::Repository already existing"
+            curl --oauth2-bearer "${{ inputs.pat }}" -o "namespace-data.json" "${{ inputs.host }}/api/v4/namespaces/${{inputs.namespace}}?with_projects=false"
+            echo "created-repo=false" >> $GITHUB_OUTPUT
+            echo "repo-url=${{ inputs.host }}/$(cat namespace-data.json | jq --raw-output .full_path)/${{ inputs.repository }}.git" >> $GITHUB_OUTPUT
+        else
+            echo "Unknown error occurred during mirroring setup"
+            exit 1
+        fi
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - uses: yesolutions/mirror-action@master
+      with:
+        REMOTE: ${{ steps.create-repo.outputs.repo-url }}
+        GIT_USERNAME: ${{ inputs.user }}
+        GIT_PASSWORD: ${{ inputs.pat }}
+        PUSH_ALL_REFS: true
