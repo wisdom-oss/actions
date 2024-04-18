@@ -17,7 +17,6 @@ inputs:
   registry-password:
     description: The password for the user pushing the image to the registry
     required: true
-    default: ${{ secrets.GITHUB_TOKEN }}
 
 runs:
   using: composite
