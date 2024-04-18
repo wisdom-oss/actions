@@ -2,10 +2,6 @@ name: 'Build Docker Image'
 description: 'Build a Docker Image for this repository'
 
 inputs:
-  image-tag:
-    description: The last part of the image identification which is used for the image
-    required: true
-    default: ${{ github.ref_name }}
   image-name:
     description: The image name under which the image is to be stored
     required: true
@@ -45,7 +41,7 @@ runs:
       name: Configure Metadata
       uses: docker/metadata-action@v5
       with:
-        images: ${{ inputs.registry }}/${{ github.repository }}:${{ inputs.image-tag }}
+        images: ${{ inputs.registry }}/${{inputs.image-name}}
         labels: |
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           org.opencontainers.image.revision=${{ github.sha }}
