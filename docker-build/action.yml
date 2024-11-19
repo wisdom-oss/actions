@@ -51,6 +51,20 @@ runs:
           type=ref,event=branch,priority=2000
           type=sha,prefix=,priority=1000
 
+    - id: build-cache
+      name: Build Cache for Docker
+      uses: actions/cache@v4
+      with:
+        path: docker-build-cache
+        key: ${{ runner.os }}-build-cache-${{ github.repository }}
+
+    - id: inject-cache
+      name: Inject BuildKit Caches
+      uses: reproducible-containers/buildkit-cache-dance@v3
+      with:
+        cache-source: docker-build-cache
+
+
     - id: build-and-push-image
       name: Build and Push Image
       uses: docker/build-push-action@v5
@@ -61,3 +75,4 @@ runs:
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        platforms: linux/arm64,linux/amd64,linux/arm/v7
