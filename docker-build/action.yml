@@ -20,10 +20,15 @@ inputs:
 
 runs:
   using: composite
+  
   steps:
     - id: checkout
       name: Checkout Build Sources
       uses: actions/checkout@v4
+
+    - id: qemu-setup
+      name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
 
     - id: setup-docker-buildx
       name: Setup BuildX for Docker
