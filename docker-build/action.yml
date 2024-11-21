@@ -17,6 +17,19 @@ inputs:
   registry-password:
     description: The password for the user pushing the image to the registry
     required: true
+  target-platform:
+    description: The Docker Image Target Platform for the build process
+    required: true
+    default: linux/arm64,linux/amd64,linux/arm/v7
+  cache-path:
+    description: The paths that shall be cached inbetween builds
+    required: false
+  cache-map:
+    description: The mapping for mounting the caches into the containers
+    required: false
+  cache-key:
+    description: A caching key that may be used to cache reproducible build artifacts
+    required: false
 
 runs:
   using: composite
@@ -59,15 +72,18 @@ runs:
     - id: build-cache
       name: Build Cache for Docker
       uses: actions/cache@v4
+      if: ${{ inputs.cache-key != ''  && inputs.cache-path != '' && inputs.cache-map != '' }}
       with:
-        path: docker-build-cache
-        key: ${{ runner.os }}-build-cache-${{ github.repository }}
+        path: ${{ inputs.cache-path }}
+        key: ${{ inputs.cache-key }}
 
     - id: inject-cache
       name: Inject BuildKit Caches
       uses: reproducible-containers/buildkit-cache-dance@v3
+      if: ${{ inputs.cache-key != ''  && inputs.cache-path != '' && inputs.cache-map != '' }}
       with:
-        cache-source: docker-build-cache
+        cache-map: ${{ inputs.cache-map }}
+        skip-extraction: ${{ steps.build-cache.outputs.cache-hit }}
 
 
     - id: build-and-push-image
@@ -80,4 +96,4 @@ runs:
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        platforms: linux/arm64,linux/amd64,linux/arm/v7
+        platforms: ${{ inputs.target-platform }}
