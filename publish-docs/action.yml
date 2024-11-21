@@ -1,0 +1,38 @@
+name: "Publish Documentation to `docs` branch"
+
+inputs:
+  artifact-name:
+    description: The name of the artifact containing the documentation files
+    required: true
+    default: documentation
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: "docs"
+
+    - name: Download Generated Documentation
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+
+    - name: Create branch folder
+      shell: bash
+      run: mkdir -p ${{ github.ref_name }}
+
+    - name: Update documentation file
+      shell: bash
+      run: |
+        mv generated-documentation.md ${{ github.ref_name }}/docs.md
+        mv README.md ${{ github.ref_name }}/README.md
+
+    - name: Push updated documentation
+      uses: actions-js/push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        author_email: ${{ github.event.head_commit.author.email }}
+        author_name: ${{ github.event.head_commit.author.name }}
+        message: ${{ github.event.head_commit.message }}
+        branch: "docs"

@@ -38,6 +38,11 @@ runs:
       uses: docker/metadata-action@v5
       with:
         images: ${{ inputs.registry }}/${{inputs.image-name}}
+        tags: |
+          type=raw,value=latest,enable={{is_default_branch}},priority=3000
+          type=ref,event=tag,priority=2500
+          type=ref,event=branch,priority=2000
+          type=sha,prefix=,priority=1000
       
     - id: registry-login
       name: Login into Github Container Registry
