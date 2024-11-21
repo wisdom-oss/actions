@@ -49,10 +49,12 @@ runs:
       
     - name: Create manifest list and push
       working-directory: /tmp/digests
+      shell: bash
       run: |
         docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
           $(printf '${{ inputs.registry }}/${{inputs.image-name}}@sha256:%s ' *)   
     
     - name: Inspect image
+      shell: bash
       run: |
         docker buildx imagetools inspect ${{ inputs.registry }}/${{inputs.image-name}}:${{ steps.meta.outputs.version }} 
