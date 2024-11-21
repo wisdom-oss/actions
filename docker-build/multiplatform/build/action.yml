@@ -69,11 +69,6 @@ runs:
         labels: |
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           org.opencontainers.image.revision=${{ github.sha }}
-        tags: |
-          type=raw,value=latest,enable={{is_default_branch}},priority=3000
-          type=ref,event=tag,priority=2500
-          type=ref,event=branch,priority=2000
-          type=sha,prefix=,priority=1000
 
     - id: build-cache
       name: Build Cache for Docker
@@ -98,7 +93,6 @@ runs:
       with:
         context: .
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.docker-metadata.outputs.tags }}
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
