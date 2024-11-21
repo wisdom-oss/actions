@@ -38,7 +38,7 @@ runs:
     - name: Prepare
       shell: bash
       run: |
-        platform=${{ matrix.platform }}
+        platform=${{ inputs.target-platform }}
         echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV  
 
     - id: checkout
@@ -76,7 +76,7 @@ runs:
       if: ${{ inputs.cache-key != ''  && inputs.cache-path != '' && inputs.cache-map != '' }}
       with:
         path: ${{ inputs.cache-path }}
-        key: ${{ inputs.cache-key }}
+        key: ${{ inputs.cache-key }}-${{ env.PLATFORM_PAIR }}
 
     - id: inject-cache
       name: Inject BuildKit Caches
