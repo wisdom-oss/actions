@@ -32,7 +32,7 @@ runs:
     - id: execute-tests
       name: Execute Test Cases
       shell: bash
-      run: go test -v 2>&1 ./...   | $GOPATH/bin/go-junit-report > report.xml
+      run: go test -v 2>&1 ./... | /home/github-runner/go/bin/go-junit-report > report.xml
 
     - id: build-summary
       name: Build Test Summary
