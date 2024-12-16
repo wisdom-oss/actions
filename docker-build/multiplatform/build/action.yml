@@ -89,13 +89,15 @@ runs:
 
     - id: build-and-push-image
       name: Build and Push Image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         push: ${{ github.event_name != 'pull_request' }}
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        provenance: false
+        sbom: false
         platforms: ${{ inputs.target-platform }}
         outputs: type=image,name=${{ inputs.registry }}/${{inputs.image-name}},push-by-digest=true,name-canonical=true,push=true
   
