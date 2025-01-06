@@ -30,29 +30,34 @@ runs:
       uses: test-summary/action@v2
       with:
         paths: report.xml
-        show: all
+        output: summary.md
+        show: "fail, skip"
       if: always()
 
     - id: read-summary
       shell: bash
       run: |
-        echo $GITHUB_STEP_SUMMARY
-        cat $GITHUB_STEP_SUMMARY
-        
+        comment=$(cat summary.md)
+        cat summary.md > $GITHUB_STEP_SUMMARY
+        echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
+        echo $comment >> $GITHUB_OUTPUT 
+        echo "EOF" >> $GITHUB_OUTPUT
          
     
     - id: comment-pr
       name: Write PR Comment
       uses: actions/github-script@v7
       if: ${{ github.event_name == 'pull_request' }}
+      env:
+        SUMMARY: ${{ steps.read-summary.outputs.summary }}
       with:
         script: |
-          const {TEST_SUMMARY} = process.env
+          const {SUMMARY} = process.env
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: TEST_SUMMARY
+            body: SUMMARY
           })
 
     - id: comment-commit
@@ -60,13 +65,13 @@ runs:
       uses: actions/github-script@v7
       if: ${{ github.event_name != 'pull_request' }}
       env:
-        COMMIT_COMMENT: ${{ steps.generate-comment.outputs.comment }}
+        SUMMARY: ${{ steps.read-summary.outputs.summary }}
       with:
         script: |
-          const {TEST_SUMMARY} = process.env
+          const {SUMMARY} = process.env
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: context.sha,
-            body: TEST_SUMMARY
+            body: SUMMARY
           })
