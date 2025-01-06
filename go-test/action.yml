@@ -1,15 +1,6 @@
 name: 'Report Go Test Results to PR'
 description: 'Execute Go unit tests and report the results to a pull request'
 
-inputs:
-  github-token:
-    description: The Github Token used to access the Github API for reporting the test results
-    required: true
-  build-flags:
-    description: Additional Build Flags used during testing
-    required: false
-    default: ""
-
 runs:
   using: "composite"
   steps:
