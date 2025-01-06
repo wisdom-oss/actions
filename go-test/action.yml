@@ -38,7 +38,6 @@ runs:
       uses: actions/github-script@v7
       if: ${{ github.event_name == 'pull_request' }}
       with:
-        github-token: ${{ inputs.github-token }}
         script: |
           const {GITHUB_STEP_SUMMARY} = process.env
           github.rest.issues.createComment({
@@ -55,7 +54,6 @@ runs:
       env:
         COMMIT_COMMENT: ${{ steps.generate-comment.outputs.comment }}
       with:
-        github-token: ${{ inputs.github-token }}
         script: |
           const {GITHUB_STEP_SUMMARY} = process.env
           github.rest.repos.createCommitComment({
