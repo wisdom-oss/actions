@@ -35,7 +35,10 @@ runs:
 
     - id: read-summary
       shell: bash
-      run: echo "TEST_SUMMARY=$(cat $GITHUB_STEP_SUMMARY)" >> $GITHUB_ENV
+      run: |
+        echo $GITHUB_STEP_SUMMARY
+        cat $GITHUB_STEP_SUMMARY
+        
          
     
     - id: comment-pr
