@@ -32,6 +32,11 @@ runs:
         paths: report.xml
         show: all
       if: always()
+
+    - id: read-summary
+      shell: bash
+      run: echo "TEST_SUMMARY=$(cat $GITHUB_STEP_SUMMARY)" >> $GITHUB_ENV
+         
     
     - id: comment-pr
       name: Write PR Comment
@@ -39,12 +44,12 @@ runs:
       if: ${{ github.event_name == 'pull_request' }}
       with:
         script: |
-          const {GITHUB_STEP_SUMMARY} = process.env
+          const {TEST_SUMMARY} = process.env
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: GITHUB_STEP_SUMMARY
+            body: TEST_SUMMARY
           })
 
     - id: comment-commit
@@ -55,10 +60,10 @@ runs:
         COMMIT_COMMENT: ${{ steps.generate-comment.outputs.comment }}
       with:
         script: |
-          const {GITHUB_STEP_SUMMARY} = process.env
+          const {TEST_SUMMARY} = process.env
           github.rest.repos.createCommitComment({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: context.sha,
-            body: GITHUB_STEP_SUMMARY
+            body: TEST_SUMMARY
           })
