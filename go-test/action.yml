@@ -24,6 +24,11 @@ runs:
       name: Execute Test Cases
       shell: bash
       run: go test -v ./... | go-junit-report -set-exit-code -subtest-mode exclude-parents -out report.xml
+      env:
+        PGUSER: postgres
+        PGPASSWORD: postgres
+        PGHOST: localhost
+        PGSSLMODE: disable
 
     - id: build-summary
       name: Build Test Summary
