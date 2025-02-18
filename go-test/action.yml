@@ -23,7 +23,7 @@ runs:
     - id: execute-tests
       name: Execute Test Cases
       shell: bash
-      run: PGUSER=${{ env.PGUSER }} PGPASSWORD=${{ env.PGPASSWORD }} PGHOST=${{ env.PGHOST }} PGSSLMODE=disable go test -v ./... | go-junit-report -set-exit-code -subtest-mode exclude-parents -out report.xml
+      run: PGUSER=${{ env.PGUSER }} PGPASSWORD=${{ env.PGPASSWORD }} PGHOST=${{ env.PGHOST }} PGSSLMODE=disable go test -v ./... | go-junit-report -subtest-mode exclude-parents -out report.xml
 
     - id: build-summary
       name: Build Test Summary
