@@ -35,6 +35,17 @@ runs:
       name: Checkout Build Sources
       uses: actions/checkout@v4
 
+    - id: git-info
+      name: Collect Git Info
+      shell: bash
+      run: |
+        echo "branch=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
+        echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        echo "commit_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        echo "commit_message=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+        echo "commit_date=$(git log -1 --date=iso --pretty=%cd)" >> $GITHUB_OUTPUT
+        echo "status=$(git status --short | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_OUTPUT
+
     - id: qemu-setup
       name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -81,7 +92,6 @@ runs:
         cache-map: ${{ inputs.cache-map }}
         skip-extraction: ${{ steps.build-cache.outputs.cache-hit }}
 
-
     - id: build-and-push-image
       name: Build and Push Image
       uses: docker/build-push-action@v5
@@ -92,3 +102,10 @@ runs:
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args:
+          - GIT_BRANCH=${{ steps.git-info.outputs.branch }}
+          - GIT_COMMIT_SHA=${{ steps.git-info.outputs.commit_sha }}
+          - GIT_COMMIT_SHORT=${{ steps.git-info.outputs.commit_short }}
+          - GIT_COMMIT_MESSAGE=${{ steps.git-info.outputs.commit_message }}
+          - GIT_COMMIT_DATE=${{ steps.git-info.outputs.commit_date }}
+          - GIT_STATUS=${{ steps.git-info.outputs.status }}
