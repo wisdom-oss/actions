@@ -102,10 +102,10 @@ runs:
         labels: ${{ steps.docker-metadata.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        build-args:
-          - GIT_BRANCH=${{ steps.git-info.outputs.branch }}
-          - GIT_COMMIT_SHA=${{ steps.git-info.outputs.commit_sha }}
-          - GIT_COMMIT_SHORT=${{ steps.git-info.outputs.commit_short }}
-          - GIT_COMMIT_MESSAGE=${{ steps.git-info.outputs.commit_message }}
-          - GIT_COMMIT_DATE=${{ steps.git-info.outputs.commit_date }}
-          - GIT_STATUS=${{ steps.git-info.outputs.status }}
+        build-args: |
+          GIT_BRANCH=${{ steps.git-info.outputs.branch }}
+          GIT_COMMIT_SHA=${{ steps.git-info.outputs.commit_sha }}
+          GIT_COMMIT_SHORT=${{ steps.git-info.outputs.commit_short }}
+          GIT_COMMIT_MESSAGE=${{ steps.git-info.outputs.commit_message }}
+          GIT_COMMIT_DATE=${{ steps.git-info.outputs.commit_date }}
+          GIT_STATUS=${{ steps.git-info.outputs.status }}

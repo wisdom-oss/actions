@@ -108,13 +108,13 @@ runs:
         provenance: false
         sbom: false
         platforms: ${{ inputs.target-platform }}
-        build-args:
-          - GIT_BRANCH=${{ steps.git-info.outputs.branch }}
-          - GIT_COMMIT_SHA=${{ steps.git-info.outputs.commit_sha }}
-          - GIT_COMMIT_SHORT=${{ steps.git-info.outputs.commit_short }}
-          - GIT_COMMIT_MESSAGE=${{ steps.git-info.outputs.commit_message }}
-          - GIT_COMMIT_DATE=${{ steps.git-info.outputs.commit_date }}
-          - GIT_STATUS=${{ steps.git-info.outputs.status }}
+        build-args: |
+          GIT_BRANCH=${{ steps.git-info.outputs.branch }}
+          GIT_COMMIT_SHA=${{ steps.git-info.outputs.commit_sha }}
+          GIT_COMMIT_SHORT=${{ steps.git-info.outputs.commit_short }}
+          GIT_COMMIT_MESSAGE=${{ steps.git-info.outputs.commit_message }}
+          GIT_COMMIT_DATE=${{ steps.git-info.outputs.commit_date }}
+          GIT_STATUS=${{ steps.git-info.outputs.status }}
         outputs: type=image,name=${{ inputs.registry }}/${{inputs.image-name}},push-by-digest=true,name-canonical=true,push=${{ github.event_name != 'pull_request' }}
   
     - name: Export digest
